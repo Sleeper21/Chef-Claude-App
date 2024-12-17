@@ -1,12 +1,20 @@
 import { useState } from "react";
+import { getRecipeFromChefClaude } from "../../ai";
 import ClaudeRecipe from "./ClaudeRecipe";
 import IngredientsList from "./IngredientsList";
 
 export default function Main() {
   const [ingredientsState, setIngredientsState] = useState([
     "olives",
+    "bacon",
+    "pasta from yesterday",
+    "broccoli",
+    "sausages",
+    "sweet corn canned",
+    "canned sardines",
   ]);
-  const [recipeShown, setRecipeShown] = useState(false);
+
+  const [receivedRecipe, setReceivedRecipe] = useState("");
 
   //condition render the list variable --> true or false
   let hasAnyIngredient = ingredientsState.length > 0;
@@ -22,9 +30,11 @@ export default function Main() {
 
   //Rendering the generated recipe
   // Get recipe button handle
-  function getRecipe() {
-    setRecipeShown((prevState) => !prevState); // --> true or false
+  async function getAndShowRecipe() {
+    const recipeMarkdown = await getRecipeFromChefClaude(ingredientsState)
+    setReceivedRecipe(recipeMarkdown)
   }
+  
 
   return (
     <main>
@@ -41,16 +51,15 @@ export default function Main() {
       </form>
 
       {/* List of Ingredients added and generate recipe button section */}
-      {hasAnyIngredient &&
-        <IngredientsList 
-          ingredients = {ingredientsState}
-          handleClick = {getRecipe}
+      {hasAnyIngredient && (
+        <IngredientsList
+          ingredients={ingredientsState}
+          handleClick={getAndShowRecipe}
         />
-      }
+      )}
 
       {/* Recipe generated */}
-      {recipeShown && <ClaudeRecipe />}
-        
+      {receivedRecipe && <ClaudeRecipe generatedRecipe={receivedRecipe} />}
     </main>
   );
 }
