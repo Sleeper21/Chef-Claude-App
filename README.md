@@ -14,3 +14,4 @@ Learned:
 Basic improvements that can be added:
     - ability remove an ingredient individually from the list
     - clear all ingredients list without having to refresh page
+    

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { getRecipeFromChefClaude } from "../../ai";
 import ClaudeRecipe from "./ClaudeRecipe";
 import IngredientsList from "./IngredientsList";
@@ -16,8 +16,13 @@ export default function Main() {
 
   const [receivedRecipe, setReceivedRecipe] = useState("");
 
+  // Set ref to be able to scroll automatically to the generated recipe section
+    // When console.log recipeSection it gives an object with a "current" property, and a value of the nodeDom included. for example a <div>
+  const recipeSection = useRef(null)
+
   //condition render the list variable --> true or false
   let hasAnyIngredient = ingredientsState.length > 0;
+
 
   //Add ingredient to display - form handle
   function addIngredient(formData) {
@@ -34,6 +39,12 @@ export default function Main() {
     const recipeMarkdown = await getRecipeFromChefClaude(ingredientsState)
     setReceivedRecipe(recipeMarkdown)
   }
+
+  // Scroll automatically to the generated recipe - effect
+  useEffect( () => {
+    if (receivedRecipe !== "" && recipeSection.current !== null)
+    recipeSection.current.scrollIntoView({behavior: "smooth"}) // --> Will scroll to the dom where we added the ref attribute and value of recipeSection
+  }, [receivedRecipe])
   
 
   return (
@@ -53,6 +64,7 @@ export default function Main() {
       {/* List of Ingredients added and generate recipe button section */}
       {hasAnyIngredient && (
         <IngredientsList
+          ref={recipeSection}
           ingredients={ingredientsState}
           handleClick={getAndShowRecipe}
         />
